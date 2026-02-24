@@ -1,0 +1,11 @@
+title = "oe-cli gitleaks config"
+
+[[allowlists]]
+description = "Allow PEM marker literals used by private-key normalization helper"
+paths = [
+  '''internal/appleads/client.go''',
+]
+regexes = [
+  '''-----BEGIN PRIVATE KEY-----''',
+  '''-----END PRIVATE KEY-----''',
+]

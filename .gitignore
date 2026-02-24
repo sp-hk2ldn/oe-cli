@@ -1,0 +1,19 @@
+# Binaries
+oe-ads
+bin/
+dist/
+
+# Build/test artifacts
+*.test
+*.out
+coverage.out
+
+# Local env/config
+.env
+.env.*
+
+# Reports and generated output
+reports/
+
+# macOS
+.DS_Store
