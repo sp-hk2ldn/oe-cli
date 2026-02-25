@@ -16,6 +16,10 @@ func main() {
 		printHelp()
 		os.Exit(0)
 	}
+	if hasFlag(args, "--help") || hasFlag(args, "-h") {
+		printHelp()
+		os.Exit(0)
+	}
 
 	ctx := context.Background()
 	command := strings.ToLower(args[1])
