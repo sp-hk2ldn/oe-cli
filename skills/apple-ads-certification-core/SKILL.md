@@ -23,6 +23,10 @@ description: Core Apple Ads certification guidance for keyword strategy, campaig
 - Do not claim unsupported Apple Ads API endpoints.
 - Prefer observed certification guidance; mark inferred automation policy as inferred.
 - Keep recommendations region-sensitive for Search Match and localization constraints.
+- Apply documented Apple Ads report API limits in all advice:
+  - Impression Share report creation (`POST /api/v5/custom-reports`): up to 10 reports per 24 hours.
+  - Impression Share report listing (`GET /api/v5/custom-reports`): max `limit` is 50; endpoint rate limit is 150 requests per 15 minutes.
+- When users hit `429` on report creation, advise waiting for the 24-hour window to roll instead of repeatedly retrying.
 
 ## References
 - Read `references/certification-findings.md` for extracted observed findings and inferred policy notes.

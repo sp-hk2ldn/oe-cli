@@ -31,6 +31,10 @@ description: Discovery -> Promotion -> Isolation operational skill for Apple Ads
 - No destructive changes without explicit user confirmation.
 - Do not remove discovery coverage before replacement exact terms are active.
 - Keep Search Match isolation behavior explicit in output recommendations.
+- Respect Apple Ads report API limits in reporting plans:
+  - Impression Share report creation (`POST /api/v5/custom-reports`): max 10 reports per 24 hours.
+  - Impression Share report listing (`GET /api/v5/custom-reports`): max `limit` 50 and 150 requests per 15 minutes.
+- If `429` occurs on report creation, prefer waiting for the rolling 24-hour window over aggressive retries.
 
 ## References
 - Read `references/discovery-promotion-sop.md` for thresholds and automation spec fields.

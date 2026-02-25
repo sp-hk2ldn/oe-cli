@@ -26,6 +26,11 @@
 - After 7 days, pause/negate promoted terms that fail tap/install/CPA thresholds.
 - Raise bids or create tailored custom product pages when terms perform strongly.
 
+## API limit guardrails
+- Impression Share report creation (`POST /api/v5/custom-reports`) is capped at 10 reports per 24 hours.
+- Impression Share report listing (`GET /api/v5/custom-reports`) supports max `limit=50` and is rate-limited at 150 requests per 15 minutes.
+- If creation requests return `429`, wait for the rolling 24-hour window to clear before retrying additional report creates.
+
 ## Explainability requirements
 - Save per-term reason codes:
   - promoted_by_thresholds

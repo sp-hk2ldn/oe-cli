@@ -35,3 +35,4 @@
 - Localization: CPP localized for target country/region requirements.
 - Variation behavior: one active variation per ad group, with fallback awareness.
 - Policy safety: privacy-safe targeting assumptions and content guideline compliance.
+- Measurement ops: Impression Share reports are constrained by API limits (max 10 creates per 24 hours; report listing max `limit=50` and 150 requests per 15 minutes).
