@@ -1270,7 +1270,23 @@ func parseAndValidateDownloadURI(raw string) (*neturl.URL, error) {
 		return nil, errors.New("custom report download URI is empty")
 	}
 	parsed, err := neturl.Parse(trimmed)
-	if err != nil || !parsed.IsAbs() {
+	if err != nil {
+		return nil, errors.New("custom report download URI is invalid")
+	}
+	if !parsed.IsAbs() {
+		// Apple custom-report responses may return a root-relative download URI.
+		// Resolve those safely against the Search Ads API host.
+		if !strings.HasPrefix(trimmed, "/") {
+			return nil, errors.New("custom report download URI is invalid")
+		}
+		base, baseErr := neturl.Parse(appleAdsAPIBase)
+		if baseErr != nil || base == nil || strings.TrimSpace(base.Host) == "" {
+			return nil, errors.New("custom report download URI is invalid")
+		}
+		root := &neturl.URL{Scheme: base.Scheme, Host: base.Host}
+		parsed = root.ResolveReference(parsed)
+	}
+	if !parsed.IsAbs() {
 		return nil, errors.New("custom report download URI is invalid")
 	}
 	if !strings.EqualFold(parsed.Scheme, "https") {
