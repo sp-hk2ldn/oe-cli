@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -33,27 +34,20 @@ func RunSovReport(ctx context.Context, client *appleads.Client, args []string) {
 		return
 	}
 
-	report, err := client.CreateImpressionShareReport(
-		ctx,
-		options.name,
-		"",
-		"",
-		options.dateRange,
-		"WEEKLY",
-		options.countries,
-		[]string{options.adamID},
-		nil,
-	)
+	report, err := createSovReportWithRetry(ctx, client, options)
 	if err != nil {
 		respondCommandError("sov-report", jsonOut, err)
 		return
 	}
 
-	deadline := time.Now().Add(90 * time.Second)
+	deadline := time.Now().Add(120 * time.Second)
 	for strings.ToUpper(report.State) != "COMPLETED" && strings.ToUpper(report.State) != "FAILED" && time.Now().Before(deadline) {
-		time.Sleep(3 * time.Second)
+		time.Sleep(4 * time.Second)
 		report, err = client.FetchImpressionShareReport(ctx, report.ID)
 		if err != nil {
+			if isRateLimitedError(err) {
+				continue
+			}
 			respondCommandError("sov-report", jsonOut, err)
 			return
 		}
@@ -67,7 +61,7 @@ func RunSovReport(ctx context.Context, client *appleads.Client, args []string) {
 		return
 	}
 
-	csvData, err := client.DownloadCustomReport(ctx, *report.DownloadURI)
+	csvData, err := downloadSovReportWithRetry(ctx, client, *report.DownloadURI)
 	if err != nil {
 		respondCommandError("sov-report", jsonOut, err)
 		return
@@ -137,6 +131,72 @@ func RunSovReport(ctx context.Context, client *appleads.Client, args []string) {
 	fmt.Printf("csvPath=%s\n", csvPath)
 	fmt.Printf("normalizedJsonPath=%s\n", normalizedPath)
 	fmt.Printf("decisionTablePath=%s\n", decisionPath)
+}
+
+func createSovReportWithRetry(ctx context.Context, client *appleads.Client, options *sovOptions) (*appleads.CustomReport, error) {
+	var lastErr error
+	for attempt := 0; attempt < 4; attempt++ {
+		report, err := client.CreateImpressionShareReport(
+			ctx,
+			options.name,
+			"",
+			"",
+			options.dateRange,
+			"WEEKLY",
+			options.countries,
+			[]string{options.adamID},
+			nil,
+		)
+		if err == nil {
+			return report, nil
+		}
+		lastErr = err
+		if !isRateLimitedError(err) {
+			return nil, err
+		}
+		time.Sleep(rateLimitBackoff(attempt))
+	}
+	if lastErr != nil {
+		return nil, lastErr
+	}
+	return nil, fmt.Errorf("Failed to create SOV report")
+}
+
+func downloadSovReportWithRetry(ctx context.Context, client *appleads.Client, downloadURI string) ([]byte, error) {
+	var lastErr error
+	for attempt := 0; attempt < 4; attempt++ {
+		data, err := client.DownloadCustomReport(ctx, downloadURI)
+		if err == nil {
+			return data, nil
+		}
+		lastErr = err
+		if !isRateLimitedError(err) {
+			return nil, err
+		}
+		time.Sleep(rateLimitBackoff(attempt))
+	}
+	if lastErr != nil {
+		return nil, lastErr
+	}
+	return nil, fmt.Errorf("Failed to download SOV report")
+}
+
+func isRateLimitedError(err error) bool {
+	var apiErr *appleads.APIError
+	return errors.As(err, &apiErr) && apiErr.StatusCode == 429
+}
+
+func rateLimitBackoff(attempt int) time.Duration {
+	switch attempt {
+	case 0:
+		return 2 * time.Second
+	case 1:
+		return 5 * time.Second
+	case 2:
+		return 10 * time.Second
+	default:
+		return 15 * time.Second
+	}
 }
 
 func parseSovOptions(args []string) (*sovOptions, error) {
