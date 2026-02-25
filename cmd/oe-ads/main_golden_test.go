@@ -139,13 +139,16 @@ func runCLIForJSON(t *testing.T, args ...string) map[string]any {
 	cmd := exec.Command(testBinaryPath, args...)
 	cmd.Env = filteredEnvWithoutAdsCreds(os.Environ())
 	out, err := cmd.CombinedOutput()
-	if err != nil {
-		t.Fatalf("command failed: %v\noutput:\n%s", err, string(out))
-	}
 	trimmed := strings.TrimSpace(string(out))
 	var payload map[string]any
 	if err := json.Unmarshal([]byte(trimmed), &payload); err != nil {
 		t.Fatalf("invalid JSON output: %v\nraw:\n%s", err, trimmed)
+	}
+	if err != nil {
+		if ok, exists := payload["ok"].(bool); exists && !ok {
+			return payload
+		}
+		t.Fatalf("command failed: %v\noutput:\n%s", err, string(out))
 	}
 	return payload
 }

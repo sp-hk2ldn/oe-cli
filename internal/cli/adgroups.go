@@ -26,8 +26,10 @@ func RunAdGroups(ctx context.Context, client *appleads.Client, args []string, js
 		runAdGroupsFind(ctx, client, args, jsonOut)
 	case "create":
 		runAdGroupsCreate(ctx, client, args, jsonOut)
-	case "pause", "activate", "delete":
+	case "pause", "activate":
 		runAdGroupsUpdateStatus(ctx, client, args, action, jsonOut)
+	case "delete":
+		runAdGroupsDelete(ctx, client, args, jsonOut)
 	default:
 		respondCommandError("adgroups", jsonOut, fmt.Errorf("Unknown adgroups action: %s", action))
 	}
@@ -344,11 +346,9 @@ func runAdGroupsUpdateStatus(ctx context.Context, client *appleads.Client, args 
 		respondCommandError("adgroups", jsonOut, err)
 		return
 	}
-	status := "DELETED"
+	status := "ENABLED"
 	if action == "pause" {
 		status = "PAUSED"
-	} else if action == "activate" {
-		status = "ENABLED"
 	}
 	updated, err := client.UpdateAdGroupStatus(ctx, campaignID, adGroupID, status)
 	if err != nil {
@@ -367,6 +367,28 @@ func runAdGroupsUpdateStatus(ctx context.Context, client *appleads.Client, args 
 		return
 	}
 	fmt.Printf("ok id=%d status=%s name=%s\n", updated.ID, updated.Status, updated.Name)
+}
+
+func runAdGroupsDelete(ctx context.Context, client *appleads.Client, args []string, jsonOut bool) {
+	campaignID, err := requiredIntFlag(args, "--campaignId")
+	if err != nil {
+		respondCommandError("adgroups", jsonOut, err)
+		return
+	}
+	adGroupID, err := requiredIntFlag(args, "--adGroupId")
+	if err != nil {
+		respondCommandError("adgroups", jsonOut, err)
+		return
+	}
+	if err := client.DeleteAdGroup(ctx, campaignID, adGroupID); err != nil {
+		respondCommandError("adgroups", jsonOut, err)
+		return
+	}
+	if jsonOut {
+		printJSON(map[string]any{"ok": true, "action": "delete", "campaignId": campaignID, "adGroupId": adGroupID})
+		return
+	}
+	fmt.Printf("ok action=delete campaignId=%d adGroupId=%d\n", campaignID, adGroupID)
 }
 
 func fetchAdGroupsWithTimeout(ctx context.Context, client *appleads.Client, campaignID int, timeout time.Duration) ([]appleads.AdGroupSummary, error) {

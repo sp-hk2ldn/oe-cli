@@ -23,8 +23,10 @@ func RunCampaigns(ctx context.Context, client *appleads.Client, args []string, j
 		runCampaignsList(ctx, client, jsonOut)
 	case "find":
 		runCampaignsFind(ctx, client, args, jsonOut)
-	case "pause", "activate", "delete":
+	case "pause", "activate":
 		runCampaignsUpdateStatus(ctx, client, args, action, jsonOut)
+	case "delete":
+		runCampaignsDelete(ctx, client, args, jsonOut)
 	case "update-budget", "set-budget":
 		runCampaignsUpdateBudget(ctx, client, args, action, jsonOut)
 	case "create":
@@ -284,11 +286,9 @@ func runCampaignsUpdateStatus(ctx context.Context, client *appleads.Client, args
 		respondCommandError("campaigns", jsonOut, err)
 		return
 	}
-	status := "DELETED"
+	status := "ENABLED"
 	if action == "pause" {
 		status = "PAUSED"
-	} else if action == "activate" {
-		status = "ENABLED"
 	}
 
 	updated, err := client.UpdateCampaignStatus(ctx, campaignID, status)
@@ -307,6 +307,23 @@ func runCampaignsUpdateStatus(ctx context.Context, client *appleads.Client, args
 		return
 	}
 	fmt.Printf("ok id=%d status=%s name=%s\n", updated.ID, updated.Status, updated.Name)
+}
+
+func runCampaignsDelete(ctx context.Context, client *appleads.Client, args []string, jsonOut bool) {
+	campaignID, err := requiredIntFlag(args, "--campaignId")
+	if err != nil {
+		respondCommandError("campaigns", jsonOut, err)
+		return
+	}
+	if err := client.DeleteCampaign(ctx, campaignID); err != nil {
+		respondCommandError("campaigns", jsonOut, err)
+		return
+	}
+	if jsonOut {
+		printJSON(map[string]any{"ok": true, "action": "delete", "campaignId": campaignID})
+		return
+	}
+	fmt.Printf("ok action=delete campaignId=%d\n", campaignID)
 }
 
 func runCampaignsUpdateBudget(ctx context.Context, client *appleads.Client, args []string, action string, jsonOut bool) {
@@ -397,6 +414,7 @@ func runCampaignsCreate(ctx context.Context, client *appleads.Client, args []str
 }
 
 func respondCommandError(command string, jsonOut bool, err error) {
+	markCommandFailed()
 	if jsonOut {
 		printJSON(map[string]any{"ok": false, "error": err.Error()})
 		return
