@@ -78,13 +78,13 @@ func RunSovReport(ctx context.Context, client *appleads.Client, args []string) {
 
 	day := time.Now().UTC().Format("2006-01-02")
 	outDir := filepath.Join(options.outputRoot, options.adamID, day)
-	if err := os.MkdirAll(outDir, 0o755); err != nil {
+	if err := os.MkdirAll(outDir, 0o700); err != nil {
 		respondCommandError("sov-report", jsonOut, err)
 		return
 	}
 
 	csvPath := filepath.Join(outDir, "sov-report.csv")
-	if err := os.WriteFile(csvPath, csvData, 0o644); err != nil {
+	if err := os.WriteFile(csvPath, csvData, 0o600); err != nil {
 		respondCommandError("sov-report", jsonOut, err)
 		return
 	}
@@ -103,7 +103,7 @@ func RunSovReport(ctx context.Context, client *appleads.Client, args []string) {
 		respondCommandError("sov-report", jsonOut, err)
 		return
 	}
-	if err := os.WriteFile(normalizedPath, normalizedData, 0o644); err != nil {
+	if err := os.WriteFile(normalizedPath, normalizedData, 0o600); err != nil {
 		respondCommandError("sov-report", jsonOut, err)
 		return
 	}
@@ -114,7 +114,7 @@ func RunSovReport(ctx context.Context, client *appleads.Client, args []string) {
 		respondCommandError("sov-report", jsonOut, err)
 		return
 	}
-	if err := os.WriteFile(decisionPath, decisionData, 0o644); err != nil {
+	if err := os.WriteFile(decisionPath, decisionData, 0o600); err != nil {
 		respondCommandError("sov-report", jsonOut, err)
 		return
 	}

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	neturl "net/url"
 	"sort"
 	"strings"
 	"time"
@@ -1244,7 +1245,11 @@ func (c *Client) DownloadCustomReport(ctx context.Context, downloadURI string) (
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadURI, nil)
+	validated, err := parseAndValidateDownloadURI(downloadURI)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, validated.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -1257,6 +1262,28 @@ func (c *Client) DownloadCustomReport(ctx context.Context, downloadURI string) (
 		return nil, httpStatusError(statusCode, body)
 	}
 	return body, nil
+}
+
+func parseAndValidateDownloadURI(raw string) (*neturl.URL, error) {
+	trimmed := strings.TrimSpace(raw)
+	if trimmed == "" {
+		return nil, errors.New("custom report download URI is empty")
+	}
+	parsed, err := neturl.Parse(trimmed)
+	if err != nil || !parsed.IsAbs() {
+		return nil, errors.New("custom report download URI is invalid")
+	}
+	if !strings.EqualFold(parsed.Scheme, "https") {
+		return nil, fmt.Errorf("custom report download URI must use https")
+	}
+	host := strings.ToLower(strings.TrimSpace(parsed.Hostname()))
+	if host == "" {
+		return nil, errors.New("custom report download URI is missing host")
+	}
+	if host != "apple.com" && !strings.HasSuffix(host, ".apple.com") {
+		return nil, fmt.Errorf("custom report download URI host is not trusted")
+	}
+	return parsed, nil
 }
 
 func (c *Client) tryKeywordBulkWrite(ctx context.Context, method string, paths []string, body any) error {

@@ -72,7 +72,7 @@ func runReportsList(ctx context.Context, client *appleads.Client, args []string,
 	for _, report := range filtered {
 		download := "-"
 		if report.DownloadURI != nil {
-			download = *report.DownloadURI
+			download = safeDisplayURL(*report.DownloadURI)
 		}
 		fmt.Printf("%d\t%s\t%s\t%s\t%s\n", report.ID, report.State, report.Granularity, report.Name, download)
 	}
@@ -108,7 +108,7 @@ func runReportsGet(ctx context.Context, client *appleads.Client, args []string, 
 		fmt.Printf("dateRange=%s\n", *report.DateRange)
 	}
 	if report.DownloadURI != nil {
-		fmt.Printf("downloadUri=%s\n", *report.DownloadURI)
+		fmt.Printf("downloadUri=%s\n", safeDisplayURL(*report.DownloadURI))
 	}
 }
 
@@ -137,11 +137,11 @@ func runReportsDownload(ctx context.Context, client *appleads.Client, args []str
 	if outPath == "" {
 		outPath = filepath.Join("reports", "custom", fmt.Sprintf("%d.csv", reportID))
 	}
-	if err := os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(outPath), 0o700); err != nil {
 		respondCommandError("reports", jsonOut, err)
 		return
 	}
-	if err := os.WriteFile(outPath, data, 0o644); err != nil {
+	if err := os.WriteFile(outPath, data, 0o600); err != nil {
 		respondCommandError("reports", jsonOut, err)
 		return
 	}
