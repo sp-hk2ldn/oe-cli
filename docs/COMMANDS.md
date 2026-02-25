@@ -7,7 +7,7 @@ All commands support `--json` unless otherwise noted.
 
 ## campaigns
 - `oe-ads campaigns list`
-- `oe-ads campaigns find [--campaignId <id> ...] [--status ENABLED,PAUSED] [--nameContains text]`
+- `oe-ads campaigns find [--campaignId <id> ...] [--adamId <id> ...] [--status ENABLED,PAUSED] [--nameContains text]`
 - `oe-ads campaigns create --name <name> --budgetAmount <number> [--budgetCurrency GBP] [--budgetType DAILY] [--status ENABLED] [--adamId <id>] [--countries GB,US] [--startTime RFC3339] [--endTime RFC3339]`
 - `oe-ads campaigns pause --campaignId <id>`
 - `oe-ads campaigns activate --campaignId <id>`

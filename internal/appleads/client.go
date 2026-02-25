@@ -48,6 +48,7 @@ type TokenResponse struct {
 
 type CampaignSummary struct {
 	ID     int    `json:"id"`
+	AdamID int    `json:"adamId,omitempty"`
 	Name   string `json:"name"`
 	Status string `json:"status"`
 }
@@ -143,7 +144,12 @@ func (c *Client) FetchCampaigns(ctx context.Context) ([]CampaignSummary, error) 
 				name = fmt.Sprintf("Campaign %d", id)
 			}
 			status := strings.ToUpper(strings.TrimSpace(stringFromAny(row["status"])))
-			results = append(results, CampaignSummary{ID: id, Name: name, Status: status})
+			results = append(results, CampaignSummary{
+				ID:     id,
+				AdamID: intFromAny(row["adamId"]),
+				Name:   name,
+				Status: status,
+			})
 			seen[id] = struct{}{}
 		}
 
