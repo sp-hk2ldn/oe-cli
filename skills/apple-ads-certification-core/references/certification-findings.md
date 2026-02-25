@@ -12,6 +12,9 @@ Source extraction: `/Users/stephenparker/workspace/keyword-research/AGENTS.md`, 
 - For search results ad variations, approved custom product pages can be selected; one active variation per ad group.
 - Default search results ad behavior applies when variation is unavailable (for example, unsupported iOS or variation on hold).
 - Reporting and optimization rely on campaign/ad-group/keyword/ad dashboards, custom reports, and impression share/rank recommendations.
+- Impression Share report API constraints:
+  - `POST /api/v5/custom-reports`: up to 10 report generations within 24 hours.
+  - `GET /api/v5/custom-reports`: max `limit` 50; rate limit 150 requests within 15 minutes.
 
 ## Performance and attribution
 - Analyze taps, spend, CPT, installs, conversion rate, and CPA.

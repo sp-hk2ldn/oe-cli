@@ -26,6 +26,9 @@ description: Apple Ads certification guidance for ad placements and creative set
 - Do not claim multiple search-result ads can show simultaneously (only one may appear at top).
 - Clearly state when default ad fallback behavior applies for search results variations.
 - Keep localization requirements explicit when recommending custom product pages.
+- If recommending Impression Share report-based analysis, include Apple Ads API limits:
+  - `POST /api/v5/custom-reports`: up to 10 reports per 24 hours.
+  - `GET /api/v5/custom-reports`: max `limit` 50 and 150 requests per 15 minutes.
 
 ## References
 - Read `references/placements-creative-cheatsheet.md` for extracted observed placement and creative findings.
