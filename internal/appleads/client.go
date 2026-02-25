@@ -15,6 +15,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -25,6 +26,12 @@ const (
 	appleIDTokenURL  = "https://appleid.apple.com/auth/oauth2/token"
 	appleAdsAPIBase  = "https://api.searchads.apple.com/api/v5"
 	campaignsPerPage = 200
+)
+
+var (
+	bearerTokenPattern = regexp.MustCompile(`(?i)bearer\s+[a-z0-9\-._~+/]+=*`)
+	jwtPattern         = regexp.MustCompile(`\b[a-zA-Z0-9_-]{8,}\.[a-zA-Z0-9_-]{8,}\.[a-zA-Z0-9_-]{8,}\b`)
+	secretParamPattern = regexp.MustCompile(`(?i)(access_token|token|signature|sig|client_secret)=([^&\s]+)`)
 )
 
 type Client struct {
@@ -603,11 +610,72 @@ func hashCredentials(creds Credentials) string {
 }
 
 func httpStatusError(code int, body []byte) error {
-	message := strings.TrimSpace(string(body))
+	message := sanitizeAPIErrorMessage(body)
+	if message == "" {
+		message = strings.TrimSpace(http.StatusText(code))
+	}
 	if message == "" {
 		message = "Unknown error"
 	}
 	return &APIError{StatusCode: code, Message: message}
+}
+
+func sanitizeAPIErrorMessage(body []byte) string {
+	trimmed := strings.TrimSpace(string(body))
+	if trimmed == "" {
+		return ""
+	}
+
+	var payload any
+	if err := json.Unmarshal([]byte(trimmed), &payload); err == nil {
+		if msg := firstErrorString(payload); msg != "" {
+			return sanitizeForDisplay(msg)
+		}
+	}
+
+	return sanitizeForDisplay(trimmed)
+}
+
+func firstErrorString(payload any) string {
+	switch typed := payload.(type) {
+	case map[string]any:
+		for _, key := range []string{"error_description", "message", "error", "detail", "reason"} {
+			if raw, ok := typed[key]; ok {
+				if msg := strings.TrimSpace(stringFromAny(raw)); msg != "" {
+					return msg
+				}
+				if msg := firstErrorString(raw); msg != "" {
+					return msg
+				}
+			}
+		}
+		for _, raw := range typed {
+			if msg := firstErrorString(raw); msg != "" {
+				return msg
+			}
+		}
+	case []any:
+		for _, raw := range typed {
+			if msg := firstErrorString(raw); msg != "" {
+				return msg
+			}
+		}
+	}
+	return ""
+}
+
+func sanitizeForDisplay(message string) string {
+	normalized := strings.Join(strings.Fields(message), " ")
+	if normalized == "" {
+		return ""
+	}
+	normalized = bearerTokenPattern.ReplaceAllString(normalized, "Bearer [REDACTED]")
+	normalized = jwtPattern.ReplaceAllString(normalized, "[REDACTED_JWT]")
+	normalized = secretParamPattern.ReplaceAllString(normalized, "$1=[REDACTED]")
+	if len(normalized) > 300 {
+		return normalized[:300] + "..."
+	}
+	return normalized
 }
 
 func intFromAny(v any) int {

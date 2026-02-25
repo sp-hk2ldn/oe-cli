@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	neturl "net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -85,4 +86,18 @@ func firstNonEmptyString(values ...string) string {
 		}
 	}
 	return ""
+}
+
+func safeDisplayURL(raw string) string {
+	trimmed := strings.TrimSpace(raw)
+	if trimmed == "" {
+		return trimmed
+	}
+	parsed, err := neturl.Parse(trimmed)
+	if err != nil || !parsed.IsAbs() {
+		return trimmed
+	}
+	parsed.RawQuery = ""
+	parsed.Fragment = ""
+	return parsed.String()
 }
