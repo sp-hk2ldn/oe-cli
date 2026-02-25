@@ -8,6 +8,7 @@ import (
 	"net/http"
 	neturl "net/url"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -1265,7 +1266,7 @@ func (c *Client) DownloadCustomReport(ctx context.Context, downloadURI string) (
 }
 
 func parseAndValidateDownloadURI(raw string) (*neturl.URL, error) {
-	trimmed := strings.TrimSpace(raw)
+	trimmed := normalizeDownloadURIRaw(raw)
 	if trimmed == "" {
 		return nil, errors.New("custom report download URI is empty")
 	}
@@ -1274,11 +1275,18 @@ func parseAndValidateDownloadURI(raw string) (*neturl.URL, error) {
 		return nil, errors.New("custom report download URI is invalid")
 	}
 	if !parsed.IsAbs() {
-		// Apple custom-report responses may return a root-relative download URI.
-		// Resolve those safely against the Search Ads API host.
-		if !strings.HasPrefix(trimmed, "/") {
-			return nil, errors.New("custom report download URI is invalid")
+		// Some responses may omit the scheme and start with a host.
+		if !strings.HasPrefix(trimmed, "/") && !strings.HasPrefix(trimmed, "//") {
+			parsedWithScheme, parseErr := neturl.Parse("https://" + trimmed)
+			if parseErr != nil {
+				return nil, errors.New("custom report download URI is invalid")
+			}
+			parsed = parsedWithScheme
 		}
+	}
+	if !parsed.IsAbs() {
+		// Apple custom-report responses may return a root-relative or scheme-relative URI.
+		// Resolve those safely against the Search Ads API host.
 		base, baseErr := neturl.Parse(appleAdsAPIBase)
 		if baseErr != nil || base == nil || strings.TrimSpace(base.Host) == "" {
 			return nil, errors.New("custom report download URI is invalid")
@@ -1289,6 +1297,10 @@ func parseAndValidateDownloadURI(raw string) (*neturl.URL, error) {
 	if !parsed.IsAbs() {
 		return nil, errors.New("custom report download URI is invalid")
 	}
+	if strings.EqualFold(parsed.Scheme, "http") {
+		// Be resilient if upstream returns an http URI for an Apple host.
+		parsed.Scheme = "https"
+	}
 	if !strings.EqualFold(parsed.Scheme, "https") {
 		return nil, fmt.Errorf("custom report download URI must use https")
 	}
@@ -1296,10 +1308,27 @@ func parseAndValidateDownloadURI(raw string) (*neturl.URL, error) {
 	if host == "" {
 		return nil, errors.New("custom report download URI is missing host")
 	}
-	if host != "apple.com" && !strings.HasSuffix(host, ".apple.com") {
+	if !isTrustedAppleHost(host) {
 		return nil, fmt.Errorf("custom report download URI host is not trusted")
 	}
 	return parsed, nil
+}
+
+func normalizeDownloadURIRaw(raw string) string {
+	trimmed := strings.TrimSpace(raw)
+	if trimmed == "" {
+		return ""
+	}
+	if unquoted, err := strconv.Unquote(trimmed); err == nil {
+		trimmed = strings.TrimSpace(unquoted)
+	}
+	trimmed = strings.Trim(trimmed, `"'`)
+	trimmed = strings.ReplaceAll(trimmed, `\/`, `/`)
+	return strings.TrimSpace(trimmed)
+}
+
+func isTrustedAppleHost(host string) bool {
+	return host == "apple.com" || strings.HasSuffix(host, ".apple.com")
 }
 
 func (c *Client) tryKeywordBulkWrite(ctx context.Context, method string, paths []string, body any) error {

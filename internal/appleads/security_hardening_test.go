@@ -27,8 +27,24 @@ func TestParseAndValidateDownloadURI(t *testing.T) {
 		t.Fatalf("unexpected host for relative URI: %s", relative.Hostname())
 	}
 
+	quotedEscaped, err := parseAndValidateDownloadURI(`"https:\/\/api.searchads.apple.com\/report.csv?token=abc"`)
+	if err != nil {
+		t.Fatalf("expected quoted escaped URI to parse, got error: %v", err)
+	}
+	if quotedEscaped.Scheme != "https" || quotedEscaped.Hostname() != "api.searchads.apple.com" {
+		t.Fatalf("unexpected quoted escaped URI parse result: %s", quotedEscaped.String())
+	}
+
+	httpAppleHost, err := parseAndValidateDownloadURI("http://api.searchads.apple.com/report.csv?token=abc")
+	if err != nil {
+		t.Fatalf("expected http apple host URI to be normalized, got error: %v", err)
+	}
+	if httpAppleHost.Scheme != "https" {
+		t.Fatalf("expected scheme to be normalized to https, got: %s", httpAppleHost.Scheme)
+	}
+
 	tests := []string{
-		"http://api.searchads.apple.com/report.csv",
+		"http://example.com/report.csv",
 		"https://example.com/report.csv",
 		"not-a-url",
 	}
