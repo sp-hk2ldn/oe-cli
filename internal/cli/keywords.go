@@ -657,7 +657,7 @@ func parseStringSet(values []string, upper bool) map[string]struct{} {
 
 func parseIntFlagSet(args []string, flag string) map[int]struct{} {
 	ids := map[int]struct{}{}
-	for _, raw := range valuesForFlag(args, flag) {
+	for _, raw := range splitCSVValues(valuesForFlag(args, flag)) {
 		id := 0
 		if _, err := fmt.Sscanf(strings.TrimSpace(raw), "%d", &id); err == nil && id > 0 {
 			ids[id] = struct{}{}

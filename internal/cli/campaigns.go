@@ -241,6 +241,7 @@ func runCampaignsFind(ctx context.Context, client *appleads.Client, args []strin
 	sort.Slice(campaigns, func(i, j int) bool { return campaigns[i].ID < campaigns[j].ID })
 
 	idFilters := parseIntFlagSet(args, "--campaignId")
+	adamIDFilters := parseIntFlagSet(args, "--adamId")
 	statusFilters := parseStringSet(splitCSVValues(valuesForFlag(args, "--status")), true)
 	nameContains := strings.ToLower(strings.TrimSpace(valueForFlag(args, "--nameContains")))
 
@@ -256,6 +257,11 @@ func runCampaignsFind(ctx context.Context, client *appleads.Client, args []strin
 				continue
 			}
 		}
+		if len(adamIDFilters) > 0 {
+			if _, ok := adamIDFilters[campaign.AdamID]; !ok {
+				continue
+			}
+		}
 		if nameContains != "" && !strings.Contains(strings.ToLower(campaign.Name), nameContains) {
 			continue
 		}
@@ -268,7 +274,7 @@ func runCampaignsFind(ctx context.Context, client *appleads.Client, args []strin
 	}
 	fmt.Printf("campaignCount=%d\n", len(filtered))
 	for _, campaign := range filtered {
-		fmt.Printf("%d\t%s\t%s\n", campaign.ID, campaign.Status, campaign.Name)
+		fmt.Printf("%d\t%s\t%d\t%s\n", campaign.ID, campaign.Status, campaign.AdamID, campaign.Name)
 	}
 }
 
