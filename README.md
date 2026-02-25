@@ -32,7 +32,14 @@ The CLI supports either:
 - split env vars:
   - `OE_ADS_CLIENT_ID`, `OE_ADS_TEAM_ID`, `OE_ADS_KEY_ID`, `OE_ADS_PRIVATE_KEY`
 
-## Build / Run
+## Install (Homebrew)
+```bash
+brew tap sp-hk2ldn/tap
+brew install sp-hk2ldn/tap/oe-ads
+oe-ads --help
+```
+
+## Build / Run From Source
 ```bash
 go build ./...
 go run ./cmd/oe-ads --help
