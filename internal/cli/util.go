@@ -10,6 +10,20 @@ import (
 	"time"
 )
 
+var commandFailed bool
+
+func ResetCommandFailure() {
+	commandFailed = false
+}
+
+func CommandFailed() bool {
+	return commandFailed
+}
+
+func markCommandFailed() {
+	commandFailed = true
+}
+
 func hasFlag(args []string, flag string) bool {
 	for _, arg := range args {
 		if arg == flag {

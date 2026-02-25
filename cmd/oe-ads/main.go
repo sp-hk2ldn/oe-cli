@@ -22,6 +22,7 @@ func main() {
 	}
 
 	ctx := context.Background()
+	cli.ResetCommandFailure()
 	command := strings.ToLower(args[1])
 	switch command {
 	case "status":
@@ -121,6 +122,10 @@ func main() {
 		printHelp()
 	default:
 		printHelp()
+		os.Exit(1)
+	}
+	if cli.CommandFailed() {
+		os.Exit(1)
 	}
 }
 

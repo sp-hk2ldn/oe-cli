@@ -277,6 +277,10 @@ func runAdsDelete(ctx context.Context, client *appleads.Client, args []string, j
 		return
 	}
 	if err := client.DeleteAd(ctx, campaignID, adGroupID, adID); err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), "ad deletion not allowed if product page is not deleted") {
+			respondCommandError("ads", jsonOut, fmt.Errorf("%s (hint: pause the ad instead, or delete the linked Product Page first)", err.Error()))
+			return
+		}
 		respondCommandError("ads", jsonOut, err)
 		return
 	}

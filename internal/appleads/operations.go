@@ -225,6 +225,32 @@ func (c *Client) UpdateCampaignStatus(ctx context.Context, campaignID int, statu
 	return &CampaignSummary{ID: id, Name: name, Status: resolvedStatus}, nil
 }
 
+func (c *Client) DeleteCampaign(ctx context.Context, campaignID int) error {
+	auth, err := c.auth(ctx)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodDelete,
+		fmt.Sprintf("%s/campaigns/%d", appleAdsAPIBase, campaignID),
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+auth.accessToken)
+	req.Header.Set("X-AP-Context", "orgId="+auth.orgID)
+	respBody, statusCode, err := c.do(req)
+	if err != nil {
+		return err
+	}
+	if statusCode < 200 || statusCode > 299 {
+		return httpStatusError(statusCode, respBody)
+	}
+	return nil
+}
+
 func (c *Client) UpdateCampaignDailyBudget(ctx context.Context, campaignID int, budgetAmount float64, budgetCurrency string) (*CampaignSummary, error) {
 	auth, err := c.auth(ctx)
 	if err != nil {
@@ -356,6 +382,42 @@ func (c *Client) UpdateAdGroupStatus(ctx context.Context, campaignID, adGroupID 
 	}
 	bid, ccy := parseBid(mapFromAny(item["defaultBidAmount"]), mapFromAny(item["defaultCpcBid"]))
 	return &AdGroupSummary{ID: id, Name: name, Status: resolvedStatus, DefaultBid: bid, Currency: ccy}, nil
+}
+
+func (c *Client) DeleteAdGroup(ctx context.Context, campaignID, adGroupID int) error {
+	auth, err := c.auth(ctx)
+	if err != nil {
+		return err
+	}
+	paths := []string{
+		fmt.Sprintf("%s/campaigns/%d/adgroups/%d", appleAdsAPIBase, campaignID, adGroupID),
+		fmt.Sprintf("%s/adgroups/%d", appleAdsAPIBase, adGroupID),
+	}
+	var lastErr error
+	for i, path := range paths {
+		req, reqErr := http.NewRequestWithContext(ctx, http.MethodDelete, path, nil)
+		if reqErr != nil {
+			return reqErr
+		}
+		req.Header.Set("Authorization", "Bearer "+auth.accessToken)
+		req.Header.Set("X-AP-Context", "orgId="+auth.orgID)
+		respBody, statusCode, doErr := c.do(req)
+		if doErr != nil {
+			return doErr
+		}
+		if statusCode >= 200 && statusCode <= 299 {
+			return nil
+		}
+		lastErr = httpStatusError(statusCode, respBody)
+		if apiErr, ok := lastErr.(*APIError); ok && apiErr.StatusCode == http.StatusNotFound && i == 0 {
+			continue
+		}
+		return lastErr
+	}
+	if lastErr != nil {
+		return lastErr
+	}
+	return errors.New("ad group delete failed")
 }
 
 func (c *Client) FetchAds(ctx context.Context, campaignID, adGroupID int) ([]AdSummary, error) {
