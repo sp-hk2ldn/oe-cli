@@ -23,9 +23,10 @@ import (
 )
 
 const (
-	appleIDTokenURL  = "https://appleid.apple.com/auth/oauth2/token"
-	appleAdsAPIBase  = "https://api.searchads.apple.com/api/v5"
-	campaignsPerPage = 200
+	appleIDTokenURL      = "https://appleid.apple.com/auth/oauth2/token"
+	appleAdsAPIBase      = "https://api.searchads.apple.com/api/v5"
+	campaignsPerPage     = 200
+	customReportsPerPage = 50
 )
 
 var (

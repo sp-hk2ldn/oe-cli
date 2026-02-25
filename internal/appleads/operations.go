@@ -1202,11 +1202,11 @@ func (c *Client) FetchCustomReports(ctx context.Context) ([]CustomReport, error)
 		return nil, err
 	}
 
-	results := make([]CustomReport, 0, campaignsPerPage)
+	results := make([]CustomReport, 0, customReportsPerPage)
 	seen := map[int64]struct{}{}
 	offset := 0
 	for {
-		resp, err := c.getJSON(ctx, fmt.Sprintf("%s/custom-reports?offset=%d&limit=%d", appleAdsAPIBase, offset, campaignsPerPage), auth)
+		resp, err := c.getJSON(ctx, fmt.Sprintf("%s/custom-reports?offset=%d&limit=%d", appleAdsAPIBase, offset, customReportsPerPage), auth)
 		if err != nil {
 			return nil, err
 		}
@@ -1231,10 +1231,10 @@ func (c *Client) FetchCustomReports(ctx context.Context) ([]CustomReport, error)
 		if page, ok := resp["pagination"].(map[string]any); ok {
 			total = intFromAny(page["totalResults"])
 		}
-		if (total > 0 && offset+campaignsPerPage >= total) || len(items) < campaignsPerPage {
+		if (total > 0 && offset+customReportsPerPage >= total) || len(items) < customReportsPerPage {
 			break
 		}
-		offset += campaignsPerPage
+		offset += customReportsPerPage
 	}
 
 	sort.Slice(results, func(i, j int) bool { return results[i].ID > results[j].ID })
