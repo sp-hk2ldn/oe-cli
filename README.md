@@ -56,16 +56,12 @@ Run:
 go test ./...
 ```
 
-## Swift vs Go Parity Check
-Run side-by-side parity against the Swift CLI:
-```bash
-./scripts/parity_check.sh
-```
-
-When credentials are present, you can deepen live checks by setting:
-- `OE_ADS_PARITY_CAMPAIGN_ID`
-- `OE_ADS_PARITY_ADGROUP_ID`
-
 ## Notes
 - Auth flow: ES256 client-secret JWT, Apple token exchange, org discovery via `/api/v5/me`.
 - Includes custom-report workflows for SOV and generic report download.
+
+## Reporting API Limits
+- Impression Share (`sov-report`) generation is limited by Apple Ads to **10 reports per rolling 24 hours** per org.
+- Custom report listing uses a maximum page size of **50** (`/custom-reports?limit=50`).
+- The custom reports API is rate-limited (Apple docs indicate **150 requests per 15 minutes** for listing), so callers should use retry/backoff on `429`.
+- Practical guidance: prefer `oe-ads reports list/get/download` for existing reports and only trigger `oe-ads sov-report` when needed.
