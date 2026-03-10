@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"oe-cli/internal/appleads"
+	"searchads-cli/internal/appleads"
 )
 
 type sovOptions struct {

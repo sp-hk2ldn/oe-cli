@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to `oe-cli`.
+Thanks for contributing to `searchads-cli`.
 
 ## Development setup
 1. Install Go (current project uses `go.mod` module mode).

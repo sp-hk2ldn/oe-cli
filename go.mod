@@ -1,3 +1,3 @@
-module oe-cli
+module searchads-cli
 
 go 1.25.7

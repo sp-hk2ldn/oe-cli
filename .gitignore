@@ -1,5 +1,5 @@
 # Binaries
-/oe-ads
+/searchads
 bin/
 dist/
 
@@ -11,6 +11,7 @@ coverage.out
 # Local env/config
 .env
 .env.*
+!.env.example
 
 # Reports and generated output
 reports/

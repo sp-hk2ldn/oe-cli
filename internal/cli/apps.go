@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"oe-cli/internal/appleads"
+	"searchads-cli/internal/appleads"
 )
 
 func RunApps(ctx context.Context, client *appleads.Client, args []string, jsonOut bool) {
