@@ -1,12 +1,12 @@
-# AGENTS.md instructions for /Users/stephenparker/workspace/oe-cli
+# AGENTS.md instructions for this repo
 
 ## Skills
 A skill is a set of local instructions stored in a `SKILL.md` file.
 
 ### Available skills
-- apple-ads-certification-core: Core Apple Ads certification knowledge for campaign structure, keyword strategy, and performance interpretation. Use for planning/review requests that ask for certification-aligned guidance. (file: /Users/stephenparker/workspace/oe-cli/skills/apple-ads-certification-core/SKILL.md)
-- apple-ads-discovery-promotion: Discovery -> Promotion -> Isolation workflow skill for turning search terms into exact-match keywords with negative-keyword isolation. Use for weekly optimization loops and automation specs. (file: /Users/stephenparker/workspace/oe-cli/skills/apple-ads-discovery-promotion/SKILL.md)
-- apple-ads-placements-creative: Apple Ads placement and creative certification guidance (Today tab, Search tab, Search results, Product pages, custom product pages, variation behavior). Use for ad placement/creative setup decisions. (file: /Users/stephenparker/workspace/oe-cli/skills/apple-ads-placements-creative/SKILL.md)
+- apple-ads-certification-core: Core Apple Ads certification knowledge for campaign structure, keyword strategy, and performance interpretation. Use for planning/review requests that ask for certification-aligned guidance. (file: skills/apple-ads-certification-core/SKILL.md)
+- apple-ads-discovery-promotion: Discovery -> Promotion -> Isolation workflow skill for turning search terms into exact-match keywords with negative-keyword isolation. Use for weekly optimization loops and automation specs. (file: skills/apple-ads-discovery-promotion/SKILL.md)
+- apple-ads-placements-creative: Apple Ads placement and creative certification guidance (Today tab, Search tab, Search results, Product pages, custom product pages, variation behavior). Use for ad placement/creative setup decisions. (file: skills/apple-ads-placements-creative/SKILL.md)
 
 ### How to use skills
 - Discovery: The list above is the skills available in this repo.

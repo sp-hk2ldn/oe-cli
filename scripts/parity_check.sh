@@ -4,8 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-SWIFT_CMD_DEFAULT=(swift run --package-path ../oe-ads-cli oe-ads)
-GO_CMD_DEFAULT=(go run ./cmd/oe-ads)
+SWIFT_CMD_DEFAULT=(swift run --package-path ../searchads-cli searchads)
+GO_CMD_DEFAULT=(go run ./cmd/searchads)
 
 SWIFT_CMD=(${SWIFT_CMD_OVERRIDE:-${SWIFT_CMD_DEFAULT[*]}})
 GO_CMD=(${GO_CMD_OVERRIDE:-${GO_CMD_DEFAULT[*]}})

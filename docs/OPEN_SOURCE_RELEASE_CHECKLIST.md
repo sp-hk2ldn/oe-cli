@@ -1,6 +1,6 @@
 # Open Source Release Checklist
 
-Use this checklist before publishing `oe-cli` publicly.
+Use this checklist before publishing `searchads-cli` publicly.
 
 ## 1. Legal and metadata
 - [ ] Add `LICENSE` (MIT/Apache-2.0 recommended).

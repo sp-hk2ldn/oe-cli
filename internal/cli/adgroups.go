@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"oe-cli/internal/appleads"
+	"searchads-cli/internal/appleads"
 )
 
 func RunAdGroups(ctx context.Context, client *appleads.Client, args []string, jsonOut bool) {

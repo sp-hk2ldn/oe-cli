@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"oe-cli/internal/appleads"
-	"oe-cli/internal/cli"
+	"searchads-cli/internal/appleads"
+	"searchads-cli/internal/cli"
 )
 
 func main() {
@@ -139,21 +139,21 @@ func hasFlag(args []string, flag string) bool {
 }
 
 func printHelp() {
-	fmt.Println(`oe-ads
+	fmt.Println(`searchads
 
 Commands:
-  oe-ads status
-  oe-ads campaigns [list|find|create|pause|activate|delete|update-budget|set-budget|report] [flags] [--json]
-  oe-ads adgroups [list|find|create|pause|activate|delete|report] [flags] [--json]
-  oe-ads ads [list|find|get|create|update|pause|activate|delete] [flags] [--json]
-  oe-ads creatives [list|find|get|create] [flags] [--json]
-  oe-ads product-pages [list|get|locales|countries|devices] [flags] [--json]
-  oe-ads apps [search|get|localized-details|eligibility] [flags] [--json]
-  oe-ads geo [search|get] [flags] [--json]
-  oe-ads ad-rejections [find|get|assets] [flags] [--json]
-  oe-ads keywords [list|find|report|add|pause|activate|remove|rebid|pause-by-text] --campaignId <id> --adGroupId <id> [flags] [--json]
-  oe-ads searchterms report --campaignId <id> [--adGroupId <id>] --startDate YYYY-MM-DD --endDate YYYY-MM-DD [--minTaps N] [--minSpend X] [--json]
-  oe-ads negatives [list|add|remove|pause|activate] --campaignId <id> [--adGroupId <id>] [--negativeKeywordId <id> ...] [--text <kw> ...] [--matchType EXACT|BROAD] [--json]
-  oe-ads sov-report --adamId <id> [--country GB,US] [--dateRange LAST_4_WEEKS] [--out reports/sov] [--json]
-  oe-ads reports [list|get|download] [--reportId <id>] [--state COMPLETED] [--nameContains text] [--limit N] [--out reports/custom/id.csv] [--json]`)
+  searchads status
+  searchads campaigns [list|find|create|pause|activate|delete|update-budget|set-budget|report] [flags] [--json]
+  searchads adgroups [list|find|create|pause|activate|delete|report] [flags] [--json]
+  searchads ads [list|find|get|create|update|pause|activate|delete] [flags] [--json]
+  searchads creatives [list|find|get|create] [flags] [--json]
+  searchads product-pages [list|get|locales|countries|devices] [flags] [--json]
+  searchads apps [search|get|localized-details|eligibility] [flags] [--json]
+  searchads geo [search|get] [flags] [--json]
+  searchads ad-rejections [find|get|assets] [flags] [--json]
+  searchads keywords [list|find|report|add|pause|activate|remove|rebid|pause-by-text] --campaignId <id> --adGroupId <id> [flags] [--json]
+  searchads searchterms report --campaignId <id> [--adGroupId <id>] --startDate YYYY-MM-DD --endDate YYYY-MM-DD [--minTaps N] [--minSpend X] [--json]
+  searchads negatives [list|add|remove|pause|activate] --campaignId <id> [--adGroupId <id>] [--negativeKeywordId <id> ...] [--text <kw> ...] [--matchType EXACT|BROAD] [--json]
+  searchads sov-report --adamId <id> [--country GB,US] [--dateRange LAST_4_WEEKS] [--out reports/sov] [--json]
+  searchads reports [list|get|download] [--reportId <id>] [--state COMPLETED] [--nameContains text] [--limit N] [--out reports/custom/id.csv] [--json]`)
 }

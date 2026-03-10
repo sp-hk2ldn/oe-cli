@@ -1,4 +1,4 @@
-title = "oe-cli gitleaks config"
+title = "searchads-cli gitleaks config"
 
 [[allowlists]]
 description = "Allow PEM marker literals used by private-key normalization helper"

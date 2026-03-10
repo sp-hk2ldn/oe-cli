@@ -9,7 +9,7 @@ import (
 
 	"context"
 
-	"oe-cli/internal/appleads"
+	"searchads-cli/internal/appleads"
 )
 
 type keywordInput struct {

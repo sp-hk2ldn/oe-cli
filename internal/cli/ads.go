@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"oe-cli/internal/appleads"
+	"searchads-cli/internal/appleads"
 )
 
 func RunAds(ctx context.Context, client *appleads.Client, args []string, jsonOut bool) {

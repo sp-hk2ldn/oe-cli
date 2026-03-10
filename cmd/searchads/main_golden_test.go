@@ -14,12 +14,12 @@ var testBinaryPath string
 
 func TestMain(m *testing.M) {
 	repoRoot := mustRepoRoot()
-	binPath := filepath.Join(os.TempDir(), "oe-ads-test-bin")
-	build := exec.Command("go", "build", "-o", binPath, "./cmd/oe-ads")
+	binPath := filepath.Join(os.TempDir(), "searchads-test-bin")
+	build := exec.Command("go", "build", "-o", binPath, "./cmd/searchads")
 	build.Dir = repoRoot
 	build.Env = os.Environ()
 	if out, err := build.CombinedOutput(); err != nil {
-		_, _ = os.Stderr.WriteString("failed to build oe-ads test binary: " + err.Error() + "\n" + string(out))
+		_, _ = os.Stderr.WriteString("failed to build searchads test binary: " + err.Error() + "\n" + string(out))
 		os.Exit(1)
 	}
 	testBinaryPath = binPath
@@ -155,7 +155,7 @@ func runCLIForJSON(t *testing.T, args ...string) map[string]any {
 
 func loadGoldenJSON(t *testing.T, name string) map[string]any {
 	t.Helper()
-	path := filepath.Join(mustRepoRoot(), "cmd", "oe-ads", "testdata", "golden", name)
+	path := filepath.Join(mustRepoRoot(), "cmd", "searchads", "testdata", "golden", name)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("failed to read golden file %s: %v", path, err)
