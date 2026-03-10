@@ -1,6 +1,6 @@
 # Apple Ads Certification Findings (Extracted)
 
-Source extraction: `/Users/stephenparker/workspace/keyword-research/AGENTS.md`, section "Apple Ads Certification Findings (Observed 2026-01-31)".
+Source extraction: local research notes, section "Apple Ads Certification Findings (Observed 2026-01-31)".
 
 ## Observed guidance
 - Use keyword themes across Brand, Category, Competitor, and Discovery.
