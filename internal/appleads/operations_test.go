@@ -90,6 +90,8 @@ func TestUpdateCampaignStatusReturnsUpdatedSummary(t *testing.T) {
 	t.Setenv(credentialsEnvJSON, testCredentialsJSON(t))
 
 	var seenBody string
+	const campaignID = 1234567890
+	const campaignName = "Test Campaign"
 	client := NewClient(&http.Client{
 		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
 			switch {
@@ -97,24 +99,24 @@ func TestUpdateCampaignStatusReturnsUpdatedSummary(t *testing.T) {
 				return jsonResponse(http.StatusOK, `{"access_token":"token","expires_in":3600}`), nil
 			case req.URL.String() == appleAdsAPIBase+"/me":
 				return jsonResponse(http.StatusOK, `{"data":{"parentOrgId":"123"}}`), nil
-			case req.Method == http.MethodPut && req.URL.Path == "/api/v5/campaigns/2143276436":
+			case req.Method == http.MethodPut && req.URL.Path == "/api/v5/campaigns/1234567890":
 				body, _ := io.ReadAll(req.Body)
 				seenBody = string(body)
-				return jsonResponse(http.StatusOK, `{"data":{"id":2143276436,"name":"20-01-2026 Category","status":"PAUSED"}}`), nil
+				return jsonResponse(http.StatusOK, `{"data":{"id":1234567890,"name":"Test Campaign","status":"PAUSED"}}`), nil
 			default:
 				return jsonResponse(http.StatusNotFound, `{"error":"unexpected request: `+req.Method+` `+req.URL.String()+`"}`), nil
 			}
 		}),
 	})
 
-	campaign, err := client.UpdateCampaignStatus(context.Background(), 2143276436, "PAUSED")
+	campaign, err := client.UpdateCampaignStatus(context.Background(), campaignID, "PAUSED")
 	if err != nil {
 		t.Fatalf("update campaign status failed: %v", err)
 	}
 	if campaign == nil {
 		t.Fatal("expected campaign summary, got nil")
 	}
-	if campaign.ID != 2143276436 || campaign.Status != "PAUSED" || campaign.Name != "20-01-2026 Category" {
+	if campaign.ID != campaignID || campaign.Status != "PAUSED" || campaign.Name != campaignName {
 		t.Fatalf("unexpected campaign summary: %+v", campaign)
 	}
 	for _, want := range []string{`"campaign":{"status":"PAUSED"}`} {
